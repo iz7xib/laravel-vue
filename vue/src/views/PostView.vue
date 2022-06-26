@@ -38,14 +38,32 @@
             </button>
           </div>
         </div>
-<!--        Title-->
+<!-- title-->
         <div>
           <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
           <input type="text" name="title" id="title" v-model="model.title" autocomplete="post_title"
                  class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full
                  shadow-sm sm:text-sm border-gray-300 rounded-md"/>
         </div>
-<!--        title end-->
+<!-- title end-->
+        <!-- Description -->
+        <div>
+          <label for="about" class="block text-sm font-medium text-gray-700">
+            Description
+          </label>
+          <div class="mt-1">
+              <textarea
+                id="description"
+                name="description"
+                rows="3"
+                v-model="model.description"
+                autocomplete="survey_description"
+                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
+                placeholder="Describe your survey"
+              />
+          </div>
+        </div>
+        <!-- Description -->
       </div>
     </div>
   </form>
