@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('title', 1000);
             $table->longText('content')->nullable();
             $table->tinyInteger('status');
-            $table->string('created_by', 1000);
+            $table->string('image')->nullable();
+            $table->string('created_by', 1000)->nullable();
             $table->string('category', 1000);
             $table->timestamps();
         });

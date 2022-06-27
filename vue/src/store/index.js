@@ -32,10 +32,45 @@ const store = createStore({
       data: {},
       token: sessionStorage.getItem("TOKEN"),
     },
+    currentPost: {
+      data: {},
+      loading: false,
+    },
+    notification: {
+      show: false,
+      type: 'success',
+      message: ''
+    },
     posts: [...tmpPosts],
   },
   getters: {},
   actions: {
+    savePost({ commit, dispatch }, post) {
+      delete post.image_url;
+
+      let response;
+      if (post.id) {
+        response = axiosClient
+          .put(`/post/${post.id}`, post)
+          .then((res) => {
+            commit('setCurrentPost', res.data)
+            return res;
+          });
+      } else {
+        response = axiosClient.post("/post", post).then((res) => {
+          commit('setCurrentPost', res.data)
+          return res;
+        });
+      }
+
+      return response;
+    },
+    deletePost({ dispatch }, id) {
+      return axiosClient.delete(`/post/${id}`).then((res) => {
+        dispatch('getPosts')
+        return res;
+      });
+    },
     register({ commit }, user){
       return axiosClient.post('/register', user)
         .then(({data}) => {
@@ -57,6 +92,29 @@ const store = createStore({
           return response;
         })
     },
+    getPost({ commit }, id) {
+      commit("setCurrentPostLoading", true);
+      return axiosClient
+        .get(`/post/${id}`)
+        .then((res) => {
+          commit("setCurrentPost", res.data);
+          commit("setCurrentPostLoading", false);
+          return res;
+        })
+        .catch((err) => {
+          commit("setCurrentPostLoading", false);
+          throw err;
+        });
+    },
+    getPosts({ commit }, {url = null} = {}) {
+      commit('setPostsLoading', true)
+      url = url || "/post";
+      return axiosClient.get(url).then((res) => {
+        commit('setPostsLoading', false)
+        commit("setPosts", res.data);
+        return res;
+      });
+    },
   },
   mutations:{
     logout: (state) => {
@@ -68,7 +126,42 @@ const store = createStore({
       state.user.token = userData.token;
       state.user.data = userData.user;
       sessionStorage.setItem('TOKEN', userData.token);
-    }
+    },
+    savePost: (state, post) => {
+      state.posts = [...state.posts, post.data]
+    },
+    updatePost: (state, post) => {
+      state.posts = state.posts.map((p) => {
+        if (p.id == post.data.id){
+          return post.data;
+        }
+        return p;
+      })
+    },
+    setPosts: (state, posts) => {
+      state.posts.links = posts.meta.links;
+      state.posts.data = posts.data;
+    },
+    setPostsLoading: (state, loading) => {
+      state.posts.loading = loading;
+    },
+    setPostLoading: (state, loading) => {
+      state.post.loading = loading;
+    },
+    setCurrentPostLoading: (state, loading) => {
+      state.currentPost.loading = loading;
+    },
+    setCurrentPost: (state, post) => {
+      state.currentPost.data = post.data;
+    },
+    notify: (state, {message, type}) => {
+      state.notification.show = true;
+      state.notification.type = type;
+      state.notification.message = message;
+      setTimeout(() => {
+        state.notification.show = false;
+      }, 3000)
+    },
   },
   modules: {}
 })

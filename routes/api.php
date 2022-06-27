@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function (){
         return $request->user();
     });
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::resource('/post', \App\Http\Controllers\PostController::class);
 });
 Route::post('/register',[AuthController::class, 'register']);
 Route::post('/login',[AuthController::class, 'login']);
